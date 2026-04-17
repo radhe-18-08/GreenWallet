@@ -1,0 +1,6 @@
+.env
+greenwallet.db
+portfolio_export.csv
+chart_export.png
+__pycache__/
+*.pyc
