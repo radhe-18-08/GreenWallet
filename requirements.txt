@@ -1,7 +1,5 @@
-PyQt5
+streamlit
 yfinance
 pandas
 numpy
-matplotlib
 requests
-python-dotenv
