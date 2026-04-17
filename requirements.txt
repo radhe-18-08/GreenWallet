@@ -1,0 +1,7 @@
+PyQt5
+yfinance
+pandas
+numpy
+matplotlib
+requests
+python-dotenv
