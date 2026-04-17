@@ -7,13 +7,9 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QH
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 
-import os
-from dotenv import load_dotenv
-load_dotenv()
-
-# ── API KEYS (loaded from .env file) ─────────────────
-ALPHA_VANTAGE_KEY = os.getenv("ALPHA_VANTAGE_KEY", "YOUR_ALPHA_VANTAGE_KEY")
-FINNHUB_KEY = os.getenv("FINNHUB_KEY", "YOUR_FINNHUB_KEY")
+# ── API KEYS ─────────────────────────────────────────
+ALPHA_VANTAGE_KEY = "7MHSFXGC9EV8NS8Y"
+FINNHUB_KEY = "d7h2s9pr01qhiu0a2emgd7h2s9pr01qhiu0a2en0"
 CACHE_EXPIRY_DAYS = 7
 
 # ── DATABASE LAYER ───────────────────────────────────
@@ -35,6 +31,26 @@ class DatabaseManager:
             id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, green_score REAL,
             recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id))''')
         self.conn.commit()
+        self.seed_demo_accounts()
+
+    def seed_demo_accounts(self):
+        """Creates 2 demo accounts with pre-loaded stock holdings on first run.
+        Prices and ESG scores are fetched LIVE from APIs (Alpha Vantage, yfinance, Finnhub)."""
+        if self.get_user("demo_investor"): return  # Already seeded
+        # Demo Account 1: Tech-heavy sustainable portfolio
+        uid1 = self.q("INSERT INTO users(username,portfolio_no) VALUES(?,?)", ("demo_investor","PF-1001"))
+        for ticker, shares in [("AAPL",10),("MSFT",5),("GOOGL",3),("AMZN",6),("NVDA",4)]:
+            self.q("INSERT INTO holdings(user_id,ticker,shares) VALUES(?,?,?)", (uid1, ticker, shares))
+        for i, score in enumerate([52,55,58,61,64,67]):
+            dt = (datetime.now() - timedelta(days=30*(6-i))).strftime("%Y-%m-%d %H:%M:%S")
+            self.q("INSERT INTO analytics(user_id,green_score,recorded_at) VALUES(?,?,?)", (uid1, score, dt))
+        # Demo Account 2: Mixed portfolio with risky energy stocks
+        uid2 = self.q("INSERT INTO users(username,portfolio_no) VALUES(?,?)", ("demo_trader","PF-2002"))
+        for ticker, shares in [("TSLA",8),("XOM",15),("JPM",7),("META",4),("BA",5)]:
+            self.q("INSERT INTO holdings(user_id,ticker,shares) VALUES(?,?,?)", (uid2, ticker, shares))
+        for i, score in enumerate([38,35,40,37,42,39]):
+            dt = (datetime.now() - timedelta(days=30*(6-i))).strftime("%Y-%m-%d %H:%M:%S")
+            self.q("INSERT INTO analytics(user_id,green_score,recorded_at) VALUES(?,?,?)", (uid2, score, dt))
 
     def q(self, sql, args=(), fetch=False, one=False):
         c = self.conn.cursor(); c.execute(sql, args); self.conn.commit()
@@ -238,8 +254,9 @@ class GreenWalletApp(QMainWindow):
         total_val, weighted, flagged, sources = 0, 0, 0, set()
         for h in holdings:
             tid, shares = h[2], h[3]
+            # Fetch real-time price from Yahoo Finance API
             try: price = yf.Ticker(tid).fast_info.last_price
-            except: price = 100.0
+            except: price = 0.0
             cache = self.db.get_cache(tid)
             if cache:
                 e, s, g, comp, src = cache[1], cache[2], cache[3], cache[4], cache[5]
