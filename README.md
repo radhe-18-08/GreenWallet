@@ -17,14 +17,19 @@ A Python-based FinTech desktop application that helps investors align their port
 - **Charts**: Matplotlib
 - **Data**: Pandas, NumPy
 
-## Setup
+## How to Run
 
-1. Install dependencies
-pip install PyQt5 yfinance pandas numpy matplotlib requests python-dotenv
+1. Install dependencies:
+2. Run the app:
 
-2. Add your API keys — copy .env.example to .env and fill in your keys
+That's it. API keys are pre-configured and the SQLite database is created automatically on first run.
 
-3. Run the app
-python greenwallet.py
+## Database Schema
+| Table | Purpose |
+|-------|---------|
+| users | Stores username and portfolio number |
+| holdings | Tracks stock tickers and share quantities |
+| esg_cache | Caches ESG scores for 7 days to save API calls |
+| analytics | Records historical Green Scores over time |
 
 ## Module: CST4160 — FinTech Coursework
