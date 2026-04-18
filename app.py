@@ -41,6 +41,7 @@ def init_db():
     conn = sqlite3.connect("greenwallet.db", check_same_thread=False); c = conn.cursor()
     c.execute('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, portfolio_no TEXT DEFAULT "")')
     c.execute('CREATE TABLE IF NOT EXISTS holdings (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INT, ticker TEXT, shares REAL)')
+    c.execute('DROP TABLE IF EXISTS esg_cache')
     c.execute('CREATE TABLE IF NOT EXISTS esg_cache (ticker TEXT PRIMARY KEY, env REAL, soc REAL, gov REAL, composite REAL, source TEXT, sector TEXT, explanation TEXT, fetched_at TIMESTAMP)')
     c.execute('CREATE TABLE IF NOT EXISTS analytics (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INT, green_score REAL, recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)')
     conn.commit(); return conn
@@ -86,12 +87,12 @@ def fetch_esg_finnhub(ticker):
 
 def get_esg(ticker):
     """Checks cache first, then tries Gemini → Finnhub. Caches for 7 days."""
-    row = q("SELECT * FROM esg_cache WHERE ticker=?",(ticker,),one=True)
-    if row and row[7]:
-        try:
-            if datetime.now()-datetime.strptime(str(row[7])[:19],"%Y-%m-%d %H:%M:%S") < timedelta(days=7):
-                return row[1],row[2],row[3],row[4],row[5],row[6] or "",row[7] if len(row)>7 else ""
-        except: pass
+    try:
+        row = q("SELECT * FROM esg_cache WHERE ticker=?",(ticker,),one=True)
+        if row and len(row)>=9 and row[8]:
+            if datetime.now()-datetime.strptime(str(row[8])[:19],"%Y-%m-%d %H:%M:%S") < timedelta(days=7):
+                return row[1],row[2],row[3],row[4],row[5],row[6] or "",row[7] or ""
+    except: pass
     # Try Gemini first (real ESG knowledge)
     result = fetch_esg_gemini(ticker)
     if result:
