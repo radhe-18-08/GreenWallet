@@ -257,14 +257,6 @@ elif st.session_state.screen == "app":
         s = next(x for x in pdata if x["ticker"]==sel); c2 = G if s["esg"]>=60 else M if s["esg"]>=30 else D
         st.markdown(f"<div class='c' style='text-align:center;'><div style='font-size:22px;font-weight:700;color:{TEXT};'>{s['ticker']}</div><div style='font-size:12px;color:{MUTED};'>{s['sector']} · via {s['source']}</div><div style='font-size:52px;font-weight:900;color:{c2};margin:12px 0;'>{int(s['esg'])}</div><div style='font-size:13px;color:{MUTED};font-style:italic;'>{s['expl']}</div></div>", unsafe_allow_html=True)
         bar("🌍 Environmental", s["env"], G); bar("👥 Social", s["soc"], "#00cec9"); bar("🏛️ Governance", s["gov"], "#6366f1")
-        st.markdown(f"<div class='sec'>Search Any Ticker</div>", unsafe_allow_html=True)
-        search = st.text_input("Ticker", placeholder="e.g. TSLA, BA, DIS", label_visibility="collapsed")
-        if st.button("🔍 Fetch ESG") and search.strip():
-            with st.spinner(f"Asking Gemini AI for {search.upper()} ESG data..."):
-                e,s2,g,comp,src,sector,expl = get_esg(search.upper())
-            c3 = G if comp>=60 else M if comp>=30 else D
-            st.markdown(f"<div class='c' style='text-align:center;'><div style='font-size:18px;font-weight:700;color:{TEXT};'>{search.upper()}</div><div style='font-size:12px;color:{MUTED};'>{sector} · via {src}</div><div style='font-size:42px;font-weight:900;color:{c3};margin:8px 0;'>{int(comp)}</div><div style='font-size:13px;color:{MUTED};font-style:italic;'>{expl}</div></div>", unsafe_allow_html=True)
-            bar("🌍 Environmental", e, G); bar("👥 Social", s2, "#00cec9"); bar("🏛️ Governance", g, "#6366f1")
 
     with tabs[3]:
         data = q("SELECT green_score,recorded_at FROM analytics WHERE user_id=? ORDER BY recorded_at",(uid,),fetch=True)
