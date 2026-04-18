@@ -53,16 +53,42 @@ def q(sql, args=(), fetch=False, one=False):
 # ── ESG FETCHING (Hardcoded real data → Gemini → Finnhub) ──
 # Real-world ESG scores based on MSCI/Sustainalytics public ratings
 KNOWN_ESG = {
+    # Tech
     "AAPL": (82,65,73,73,"Technology","Strong privacy practices and renewable energy commitments across supply chain"),
     "MSFT": (85,78,80,81,"Technology","Industry leader in carbon negative pledge and AI ethics governance"),
     "GOOGL": (70,62,58,63,"Technology","Strong on renewable energy but faces governance concerns around data privacy"),
     "NVDA": (60,55,65,60,"Semiconductors","Growing focus on energy-efficient computing but supply chain transparency needs work"),
     "AMZN": (45,42,50,46,"E-Commerce","High carbon footprint from logistics offset partially by renewable energy investments"),
+    "META": (55,38,42,45,"Technology","Renewable energy in data centers but social score impacted by content moderation issues"),
+    "NFLX": (58,52,60,57,"Entertainment","Moderate ESG profile with growing content diversity initiatives"),
+    "CRM": (78,75,72,75,"Cloud Software","Strong ESG performer with net-zero commitment and equality programs"),
+    "INTC": (74,68,66,69,"Semiconductors","Solid environmental track record but facing competitive and governance pressures"),
+    "AMD": (62,58,64,61,"Semiconductors","Improving energy efficiency in chips but limited ESG disclosure history"),
+    # Energy
     "TSLA": (72,35,40,49,"Automotive","Strong environmental mission but governance and labor practices draw criticism"),
     "XOM": (18,32,45,32,"Oil & Gas","Low environmental score due to fossil fuel core business and emissions record"),
-    "JPM": (48,55,60,54,"Financial Services","Moderate ESG profile with scrutiny on fossil fuel financing vs green bond issuance"),
-    "META": (55,38,42,45,"Technology","Renewable energy in data centers but social score impacted by content moderation issues"),
+    "CVX": (22,35,48,35,"Oil & Gas","Heavy fossil fuel exposure with modest renewable transition efforts"),
+    "NEE": (88,70,74,77,"Renewable Energy","Leading US utility in wind and solar capacity with strong ESG commitment"),
+    "ENPH": (84,62,68,71,"Clean Energy","Solar microinverter leader contributing directly to clean energy transition"),
+    # Finance
+    "JPM": (48,55,60,54,"Financial Services","Moderate ESG with scrutiny on fossil fuel financing vs green bond issuance"),
+    "GS": (44,50,58,51,"Financial Services","Active in green bonds but criticized for financing controversial projects"),
+    "V": (62,68,75,68,"Financial Services","Strong governance and data security but limited direct environmental impact"),
+    "MA": (64,66,74,68,"Financial Services","Similar to Visa with strong governance and financial inclusion initiatives"),
+    # Healthcare
     "JNJ": (68,72,70,70,"Healthcare","Strong social responsibility in healthcare access but faces product safety litigation"),
+    "PFE": (65,74,62,67,"Pharmaceuticals","High social score from vaccine access programs but pricing concerns remain"),
+    "UNH": (55,68,66,63,"Health Insurance","Growing focus on health equity but faces regulatory and pricing scrutiny"),
+    # Consumer
+    "KO": (58,65,68,64,"Beverages","Plastic waste challenges but strong community and water stewardship programs"),
+    "PEP": (60,63,66,63,"Beverages","Similar to Coca-Cola with ongoing packaging sustainability investments"),
+    "NKE": (56,48,58,54,"Apparel","Supply chain labor concerns offset by climate and diversity commitments"),
+    "SBUX": (64,60,55,60,"Food & Beverage","Ethical sourcing and environmental targets but faces labor relations issues"),
+    # Industrial & Other
+    "BA": (40,45,35,40,"Aerospace","Safety governance failures and defense sector exposure drag ESG score down"),
+    "DIS": (62,70,58,63,"Entertainment","Strong social and diversity metrics but governance faced activist pressure"),
+    "WMT": (52,55,60,56,"Retail","Massive renewable energy push but labor practices and supply chain under scrutiny"),
+    "COST": (58,62,72,64,"Retail","Strong employee treatment and governance but environmental disclosure is limited"),
 }
 
 def fetch_esg_gemini(ticker):
